@@ -5,6 +5,7 @@ export default function App() {
   const [input, setInput] = useState<string>("");
   const [result, setResult] = useState<OptimizeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   useEffect(() => {
     if (!input) {
@@ -33,15 +34,26 @@ export default function App() {
     if (result) {
       try {
         await navigator.clipboard.writeText(result.optimized);
-        alert("コピーしました！");
+        setNotification({ message: "コピーしました！", type: "success" });
+        setTimeout(() => setNotification(null), 2000);
       } catch (e) {
-        alert("コピーに失敗しました");
+        setNotification({ message: "コピーに失敗しました", type: "error" });
+        setTimeout(() => setNotification(null), 2000);
       }
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col p-4 gap-4 max-w-7xl mx-auto w-full">
+    <div className="flex-1 flex flex-col p-4 gap-4 max-w-7xl mx-auto w-full relative">
+      {notification && (
+        <div 
+          className={`fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg transition-opacity duration-300 ${
+            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white`}
+        >
+          {notification.message}
+        </div>
+      )}
       <h1 className="text-2xl font-bold mb-2">SVG Optimizer & Preview</h1>
       <div className="flex flex-col md:flex-row gap-4 flex-1">
         {/* Input Area */}
